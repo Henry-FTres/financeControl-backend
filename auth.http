@@ -1,0 +1,24 @@
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+"email": "usuario@upf.br",
+"password": "abc123"
+}
+
+###
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+"name": "usuario",
+"email": "usuario@upf.br",
+"cpf": "12345678900",
+"birthDate": "2000-01-01",
+"phone": "51 99999 9999",
+"passwordHash": "abc123"
+}
+
+###
+GET http://localhost:3000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MDg1ODUwMCwiZXhwIjoxNzkwOTQ0OTAwfQ.swVtPeOIzbbK2wl5G4Yx_FMEBy8mDlABUTSJSmCwOZk
