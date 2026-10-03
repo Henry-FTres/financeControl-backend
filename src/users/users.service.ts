@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateUserDTO } from 'src/dtos/create-users-dto';
+import { UpdateUserDTO } from 'src/dtos/update-users-dto';
 import bcrypt from 'bcryptjs';
 import { GetUserDTO } from 'src/dtos/get-user-dto';
 
@@ -34,12 +35,13 @@ export class UsersService {
         });
     }
 
-    async updateUser(id: number, dto: CreateUserDTO): Promise<void> {
+    async updateUser(id: number, dto: UpdateUserDTO): Promise<void> {
         await this.prisma.user.update({
             where: { id },
             data: {
-                name: dto.name ?? '',
-                email: dto.email ?? ''
+                name: dto.name,
+                email: dto.email,
+                phone: dto.phone
             }
         });
     }

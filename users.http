@@ -1,4 +1,5 @@
-GET http://localhost:3000/api/users
+GET http://localhost:3000/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MTA0OTM0OSwiZXhwIjoxNzkxMTM1NzQ5fQ.gJXmJxjSE55jcBvJgeKK-Y0tX9briNs7zkG6cq0DHCQ
 
 ###
 POST http://localhost:3000/api/users
@@ -21,3 +22,13 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:3000/api/users/1
+
+###
+PUT http://localhost:3000/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MTA0OTM0OSwiZXhwIjoxNzkxMTM1NzQ5fQ.gJXmJxjSE55jcBvJgeKK-Y0tX9briNs7zkG6cq0DHCQ
+Content-Type: application/json
+
+{
+    "name": "nome alterado",
+    "email": "usuario@upf.br"
+}

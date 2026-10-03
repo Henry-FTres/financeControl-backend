@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateUserDTO } from 'src/dtos/create-users-dto';
+import { UpdateUserDTO } from 'src/dtos/update-users-dto';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -25,16 +26,16 @@ export class UsersController {
         return await this.service.findById(req.user.sub);
     }
 
-    @Put(':id')
-    async update(@Param('id', ParseIntPipe) id: number, 
-                 @Body() body: CreateUserDTO) 
+    @Put('me')
+    async update(@Req() req: any, 
+                 @Body() body: UpdateUserDTO) 
     {
-        await this.service.updateUser(id, body);
+        await this.service.updateUser(req.user.sub, body);
     }
     
-    @Delete(':id')
-    async delete(@Param('id', ParseIntPipe) id: number) {
-        await this.service.deleteUser(id);
+    @Delete('me')
+    async delete(@Req() req: any) {
+        await this.service.deleteUser(req.user.sub);
     }
 
     
