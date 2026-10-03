@@ -22,7 +22,7 @@ export class UsersService {
                 phone: dto.phone ?? null, // precisa do ?? null para fazer o tratamento do campo opcional, caso não seja passado, ele será nulo no banco de dados
                 passwordHash: passwordHash
             },
-            select: { id: true, name: true, email: true, createdAt: true
+            select: { id: true, name: true, email: true, cpf: true, birthDate: true, phone: true, createdAt: true
             }
         })
     }
@@ -51,5 +51,12 @@ export class UsersService {
 
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({ where: { email } });
+    }
+
+    async findById(id: number) {
+        return this.prisma.user.findUnique({ 
+            where: { id },
+            select: { id: true, name: true, email: true, cpf: true, birthDate: true, phone: true, createdAt: true },
+        });
     }
 }

@@ -22,3 +22,7 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/api/users
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MDg1ODUwMCwiZXhwIjoxNzkwOTQ0OTAwfQ.swVtPeOIzbbK2wl5G4Yx_FMEBy8mDlABUTSJSmCwOZk
+
+###
+GET http://localhost:3000/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MTA0OTM0OSwiZXhwIjoxNzkxMTM1NzQ5fQ.gJXmJxjSE55jcBvJgeKK-Y0tX9briNs7zkG6cq0DHCQ
