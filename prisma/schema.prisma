@@ -29,15 +29,18 @@ enum TransactionType {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   name         String
-  email        String    @unique
-  cpf          String    @unique
-  birthDate    DateTime
+  email        String     @unique
+  cpf          String?    @unique
+  birthDate    DateTime?
   phone        String?
+  personType   PersonType
+  cnpj         String?    @unique
+  legalName    String?
   accounts     Account[]
   passwordHash String
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime   @default(now())
 
   categories Category[]
   goals      Goal[]
@@ -50,9 +53,6 @@ model Account {
   pixKey        String?
   balance       Decimal
   accountType   AccountType
-  personType    PersonType
-  cnpj          String?
-  legalName     String?
   userId        Int
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions  Transaction[]
@@ -82,7 +82,7 @@ model Category {
   id           Int           @id @default(autoincrement())
   name         String
   userId       Int?
-  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade) 
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
 
   @@index([userId])
