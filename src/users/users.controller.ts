@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateUserDTO } from 'src/dtos/create-users-dto';
 import { UsersService } from './users.service';
+import { UpdateUserDTO } from 'src/dtos/update-user-dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,7 +23,7 @@ export class UsersController {
 
     @Put(':id')
     async update(@Param('id', ParseIntPipe) id: number, 
-                 @Body() body: CreateUserDTO) 
+                 @Body() body: UpdateUserDTO) 
     {
         await this.service.updateUser(id, body);
     }
