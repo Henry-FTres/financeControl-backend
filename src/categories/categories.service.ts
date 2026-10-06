@@ -1,6 +1,7 @@
 import {
   Injectable,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateCategoryDTO } from 'src/dtos/create-category-dto';
@@ -21,8 +22,20 @@ export class CategoriesService {
   }
 
   async create(userId: number, dto: CreateCategoryDTO) {
+    const existing = await this.prisma.category.findFirst({
+      // procura uma categoria com o mesmo nome, entre as padrão e as do usuário
+      where: {
+        name: dto.name,
+        OR: [{ userId: null }, { userId: userId }],
+      },
+    });
+
+    if (existing) {
+      // se já existir, recusa com erro 409
+      throw new ConflictException('Já existe uma categoria com esse nome');
+    }
+
     return this.prisma.category.create({
-      // cria category recebendo name e userId
       data: {
         name: dto.name,
         userId: userId,
@@ -39,6 +52,20 @@ export class CategoriesService {
     if (!category) {
       // se não encontrar a categoria, lança NotFoundException
       throw new NotFoundException('Categoria não encontrada');
+    }
+
+    const existing = await this.prisma.category.findFirst({
+      // procura outra categoria com o mesmo nome, entre as padrão e as do usuário
+      where: {
+        name: dto.name,
+        id: { not: id },
+        OR: [{ userId: null }, { userId: userId }],
+      },
+    });
+
+    if (existing) {
+      // se já existir outra com esse nome, recusa com erro 409
+      throw new ConflictException('Já existe uma categoria com esse nome');
     }
 
     return this.prisma.category.update({
@@ -64,5 +91,4 @@ export class CategoriesService {
       where: { id: id },
     });
   }
-
 }

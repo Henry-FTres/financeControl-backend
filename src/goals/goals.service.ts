@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateGoalDTO } from 'src/dtos/create-goal-dto';
 import { UpdateGoalDTO } from 'src/dtos/update-goal-dto';
@@ -21,10 +25,19 @@ export class GoalsService {
   }
 
   async create(userId: number, dto: CreateGoalDTO) {
+    const deadline = new Date(dto.deadline);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (deadline < today) {
+      // não permite criar meta com prazo no passado
+      throw new BadRequestException('O prazo da meta não pode ser no passado');
+    }
+
     return this.prisma.goal.create({
       data: {
         targetAmount: dto.targetAmount,
-        deadline: new Date(dto.deadline),
+        deadline: deadline,
         description: dto.description,
         userId: userId,
       },
@@ -42,19 +55,35 @@ export class GoalsService {
       throw new NotFoundException('Meta não encontrada');
     }
 
+    let deadline: Date | undefined = undefined;
+
+    if (dto.deadline) {
+      // só valida o prazo se ele foi enviado
+      deadline = new Date(dto.deadline);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (deadline < today) {
+        // não permite mudar o prazo para o passado
+        throw new BadRequestException(
+          'O prazo da meta não pode ser no passado',
+        );
+      }
+    }
+
     return this.prisma.goal.update({
       // atualiza a meta com os novos dados
       where: { id: id },
       data: {
         targetAmount: dto.targetAmount,
         currentAmount: dto.currentAmount,
-        deadline: dto.deadline ? new Date(dto.deadline) : undefined,
+        deadline: deadline,
         description: dto.description,
       },
     });
   }
 
-    async delete(userId: number, id: number) {
+  async delete(userId: number, id: number) {
     const goal = await this.prisma.goal.findFirst({
       // busca a meta pelo id e userId
       where: { id: id, userId: userId },
