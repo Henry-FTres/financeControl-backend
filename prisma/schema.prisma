@@ -29,73 +29,73 @@ enum TransactionType {
 }
 
 model User {
-  id              Int        @id @default(autoincrement())
-  name            String
-  email           String     @unique
-  cpf             String     @unique
-  birthDate       DateTime
-  phone           String?
-  accounts        Account[]
-  passwordHash    String
-  createdAt       DateTime   @default(now())
+  id           Int        @id @default(autoincrement())
+  name         String
+  email        String     @unique
+  cpf          String?    @unique
+  birthDate    DateTime?
+  phone        String?
+  personType   PersonType
+  cnpj         String?    @unique
+  legalName    String?
+  accounts     Account[]
+  passwordHash String
+  createdAt    DateTime   @default(now())
 
-  categories      Category[]
-  goals           Goal[]
+  categories Category[]
+  goals      Goal[]
 }
 
 model Account {
-  accountNumber   String
-  institution     String
-  pixKey          String?
-  balance         Decimal
-  accountType     AccountType
-  personType      PersonType
-  cnpj            String?
-  legalName       String?
-  userId          Int
-  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions    Transaction[]
+  id            Int           @id @default(autoincrement())
+  accountNumber String
+  institution   String
+  pixKey        String?
+  balance       Decimal
+  accountType   AccountType
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
 
-  @@id([accountNumber, institution])
+  @@unique([accountNumber, institution])
   @@index([userId])
 }
 
 model Transaction {
-  id                  Int               @id @default(autoincrement())
-  date                DateTime
-  amount              Decimal
-  transactionType     TransactionType
-  description         String?
-  counterparty        String
-  fixed               Boolean           @default(false)
-  categoryId          Int?
-  accountNumber       String
-  institution         String
-  account             Account           @relation(fields: [accountNumber, institution], references: [accountNumber, institution], onDelete: Cascade)
-  category            Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  
-  @@index([accountNumber, institution])
+  id              Int             @id @default(autoincrement())
+  date            DateTime
+  amount          Decimal
+  transactionType TransactionType
+  description     String?
+  counterparty    String
+  fixed           Boolean         @default(false)
+  accountId       Int
+  categoryId      Int?
+  account         Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category        Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([accountId])
   @@index([categoryId])
 }
 
 model Category {
-  id              Int             @id @default(autoincrement()) 
-  name            String
-  userId          Int?
-  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions    Transaction[]
-  
+  id           Int           @id @default(autoincrement())
+  name         String
+  userId       Int?
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
   @@index([userId])
 }
 
 model Goal {
-  id              Int             @id @default(autoincrement())
-  targetAmount    Decimal
-  currentAmount   Decimal         @default(0)
-  deadline        DateTime
-  description     String?
-  userId          Int
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            Int      @id @default(autoincrement())
+  targetAmount  Decimal
+  currentAmount Decimal  @default(0)
+  deadline      DateTime
+  description   String?
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
