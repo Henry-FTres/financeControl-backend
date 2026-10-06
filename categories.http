@@ -21,5 +21,5 @@ Content-Type: application/json
 }
 
 ### Apagar categoria
-DELETE http://localhost:3000/api/categories/1
+DELETE http://localhost:3000/api/categories/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
