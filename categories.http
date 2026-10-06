@@ -1,0 +1,25 @@
+### Listar categorias
+GET http://localhost:3000/api/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+
+### Criar categoria
+POST http://localhost:3000/api/categories
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+Content-Type: application/json
+
+{
+    "name": "Faculdade"
+}
+
+### Atualizar categoria
+PUT http://localhost:3000/api/categories/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+Content-Type: application/json
+
+{
+    "name": "Estudos"
+}
+
+### Apagar categoria
+DELETE http://localhost:3000/api/categories/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso

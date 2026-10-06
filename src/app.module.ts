@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { PrismaModule } from './database/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     AccountsModule,
     PrismaModule,
     TransactionsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
