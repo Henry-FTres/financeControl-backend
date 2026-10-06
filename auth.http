@@ -11,12 +11,13 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-"name": "usuario",
+"name": "usuario teste",
 "email": "usuario@upf.br",
+"password": "abc123",
+"personType": "FISICA",
 "cpf": "12345678900",
 "birthDate": "2000-01-01",
-"phone": "51 99999 9999",
-"passwordHash": "abc123"
+"phone": "54999999999"
 }
 
 ###
