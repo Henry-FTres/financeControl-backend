@@ -1,0 +1,29 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5Mjk4MiwiZXhwIjoxNzkxMzc5MzgyfQ.got4hxEGJScyqkLaQOwFh76PgiHHPksZLGOWr_T7mL4
+
+### Listar metas
+GET http://localhost:3000/api/goals
+Authorization: Bearer {{token}}
+
+### Criar meta
+POST http://localhost:3000/api/goals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "targetAmount": 5000,
+    "deadline": "2026-12-31",
+    "description": "Viagem de férias"
+}
+
+### Atualizar progresso da meta
+PUT http://localhost:3000/api/goals/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentAmount": 5000
+}
+
+### Apagar meta
+DELETE http://localhost:3000/api/goals/1
+Authorization: Bearer {{token}}

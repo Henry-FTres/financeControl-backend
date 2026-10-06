@@ -8,6 +8,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { PrismaModule } from './database/prisma.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { CategoriesModule } from './categories/categories.module';
+import { GoalsModule } from './goals/goals.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CategoriesModule } from './categories/categories.module';
     PrismaModule,
     TransactionsModule,
     CategoriesModule,
+    GoalsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
