@@ -12,8 +12,8 @@ import { PrismaModule } from './database/prisma.module';
     ConfigModule.forRoot({ isGlobal: true }), // precisa ter esses imports para as rotas de user e auth funcionarem, caso contrário, não vai conseguir ler as variáveis de ambiente
     UsersModule,
     AuthModule,
-    AccountsModule, 
-    PrismaModule
+    AccountsModule,
+    PrismaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

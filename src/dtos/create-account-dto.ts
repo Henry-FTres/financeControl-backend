@@ -1,25 +1,29 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
-import { AccountType } from "../../prisma/generated/prisma/client";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { AccountType } from '../../prisma/generated/prisma/client';
 
 export class CreateAccountDTO {
+  @IsString()
+  @IsNotEmpty()
+  accountNumber!: string;
 
-    @IsString()
-    @IsNotEmpty()
-    accountNumber!: string;
+  @IsString()
+  @IsNotEmpty()
+  institution!: string;
 
-    @IsString()
-    @IsNotEmpty()
-    institution!: string;
+  @IsOptional()
+  @IsString()
+  pixKey?: string;
 
-    @IsOptional()
-    @IsString()
-    pixKey?: string;
+  @IsEnum(AccountType)
+  accountType!: AccountType;
 
-    @IsEnum(AccountType)
-    accountType!: AccountType;
-
-    // saldo inicial da conta; depois da criação, só as transações alteram o saldo
-    @IsNumber({ maxDecimalPlaces: 2 })
-    balance!: number;
-
+  // saldo inicial da conta; depois da criação, só as transações alteram o saldo
+  @IsNumber({ maxDecimalPlaces: 2 })
+  balance!: number;
 }
