@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
-import { CreateUserDTO } from 'src/dtos/create-users-dto';
-import { UpdateUserDTO } from 'src/dtos/update-users-dto';
+import { CreateUserDTO } from 'src/dtos/create-user-dto';
 import bcrypt from 'bcryptjs';
 import { GetUserDTO } from 'src/dtos/get-user-dto';
 import { PersonType } from '../../prisma/generated/prisma/client';
