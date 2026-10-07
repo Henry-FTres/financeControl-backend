@@ -16,11 +16,12 @@ export class JwtAuthGuard implements CanActivate {
     const method = (req.method || '').toUpperCase();
 
     if (method === 'OPTIONS') return true;
-    const url = String(req.originalUrl || req.url || '');
+     // caminho da rota sem a query string (parte depois do ?) e sem barra no final
+    const path = String(req.path || '').replace(/\/+$/, '');
 
-    //liberar somente estas duas rotas
-    if (url.includes('/auth/login') || url.includes('/auth/register'))
-      return true;
+    // liberar somente estas duas rotas, comparando o caminho exato
+    const publicRoutes = ['/api/auth/login', '/api/auth/register'];
+    if (publicRoutes.includes(path)) return true;
 
     // exige Authorization: Bearer <token>
     const auth = String(req.headers?.authorization || '');
