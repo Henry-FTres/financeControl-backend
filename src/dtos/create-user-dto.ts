@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
   Length,
+  MinLength,
   ValidateIf,
 } from 'class-validator';
 import { PersonType } from '../../prisma/generated/prisma/client';
@@ -23,6 +24,7 @@ export class CreateUserDTO {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(8)
   password: string = '';
 
   @IsEnum(PersonType)

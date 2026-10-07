@@ -1,29 +1,53 @@
+### Variável do token (preenchida automaticamente pelo login abaixo)
+@token = {{login.response.body.access_token}}
+
+### Login
+# @name login
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-"email": "usuario@upf.br",
-"password": "abc123"
+    "email": "usuario@upf.br",
+    "password": "novaSenha123"
 }
 
-###
+### Cadastro
 POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-"name": "usuario teste",
-"email": "usuario@upf.br",
-"password": "abc123",
-"personType": "FISICA",
-"cpf": "12345678900",
-"birthDate": "2000-01-01",
-"phone": "54999999999"
+    "name": "usuario teste",
+    "email": "usuario@upf.br",
+    "password": "abc12345",
+    "personType": "FISICA",
+    "cpf": "12345678900",
+    "birthDate": "2000-01-01",
+    "phone": "54999999999"
 }
 
-###
-GET http://localhost:3000/api/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MDg1ODUwMCwiZXhwIjoxNzkwOTQ0OTAwfQ.swVtPeOIzbbK2wl5G4Yx_FMEBy8mDlABUTSJSmCwOZk
-
-###
+### Ver meus dados
 GET http://localhost:3000/api/users/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyIsImlhdCI6MTc5MTA0OTM0OSwiZXhwIjoxNzkxMTM1NzQ5fQ.gJXmJxjSE55jcBvJgeKK-Y0tX9briNs7zkG6cq0DHCQno
+Authorization: Bearer {{token}}
+
+### Atualizar meus dados
+PUT http://localhost:3000/api/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "nome alterado"
+}
+
+### Trocar senha
+PUT http://localhost:3000/api/users/me/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentPassword": "abc12345",
+    "newPassword": "novaSenha123"
+}
+
+### Apagar minha conta
+DELETE http://localhost:3000/api/users/me
+Authorization: Bearer {{token}}

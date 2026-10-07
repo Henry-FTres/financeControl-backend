@@ -13,6 +13,7 @@ import { PrismaService } from 'src/database/prisma.service';
 import { CreateUserDTO } from 'src/dtos/create-user-dto';
 import { UsersService } from './users.service';
 import { UpdateUserDTO } from 'src/dtos/update-user-dto';
+import { ChangePasswordDTO } from 'src/dtos/change-password-dto';
 
 @Controller('users')
 export class UsersController {
@@ -32,6 +33,11 @@ export class UsersController {
   @Put('me')
   async update(@Req() req: any, @Body() body: UpdateUserDTO) {
     await this.service.updateUser(req.user.sub, body);
+  }
+
+  @Put('me/password')
+  async changePassword(@Req() req: any, @Body() body: ChangePasswordDTO) {
+    await this.service.changePassword(req.user.sub, body);
   }
 
   @Delete('me')

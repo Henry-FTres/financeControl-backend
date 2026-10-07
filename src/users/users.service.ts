@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma.service';
 import { CreateUserDTO } from 'src/dtos/create-user-dto';
 import bcrypt from 'bcryptjs';
 import { PersonType } from '../../prisma/generated/prisma/client';
 import { UpdateUserDTO } from 'src/dtos/update-user-dto';
+import { ChangePasswordDTO } from 'src/dtos/change-password-dto';
 
 @Injectable()
 export class UsersService {
@@ -63,6 +64,32 @@ export class UsersService {
         legalName: dto.legalName,
         birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
       },
+    });
+  }
+
+  async changePassword(id: number, dto: ChangePasswordDTO): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      // se o usuário não existir, lança NotFoundException
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    // compara a senha atual com a senha armazenada no banco de dados
+    const ok = await bcrypt.compare(dto.currentPassword, user.passwordHash); 
+
+    if (!ok) {
+      // se a senha atual estiver errada, recusa
+      throw new BadRequestException('Senha atual incorreta');
+    }
+
+    // criptografa a nova senha antes de salvar
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+
+    await this.prisma.user.update({
+      // salva a nova senha já criptografada
+      where: { id },
+      data: { passwordHash: passwordHash },
     });
   }
 
