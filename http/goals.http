@@ -1,4 +1,15 @@
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5Mjk4MiwiZXhwIjoxNzkxMzc5MzgyfQ.got4hxEGJScyqkLaQOwFh76PgiHHPksZLGOWr_T7mL4
+### Variável do token (preenchida automaticamente pelo login abaixo)
+@token = {{login.response.body.access_token}}
+
+### Login
+# @name login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "abc12345"
+}
 
 ### Listar metas
 GET http://localhost:3000/api/goals
@@ -13,6 +24,17 @@ Content-Type: application/json
     "targetAmount": 5000,
     "deadline": "2026-12-31",
     "description": "Viagem de férias"
+}
+
+### Criar meta com prazo no passado (deve dar 400)
+POST http://localhost:3000/api/goals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "targetAmount": 1000,
+    "deadline": "2020-01-01",
+    "description": "Meta inválida"
 }
 
 ### Atualizar progresso da meta

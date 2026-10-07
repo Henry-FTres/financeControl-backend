@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Req,
-} from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma.service';
-import { CreateUserDTO } from 'src/dtos/create-user-dto';
+import { Body, Controller, Delete, Get, Put, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDTO } from 'src/dtos/update-user-dto';
 import { ChangePasswordDTO } from 'src/dtos/change-password-dto';
@@ -18,12 +6,6 @@ import { ChangePasswordDTO } from 'src/dtos/change-password-dto';
 @Controller('users')
 export class UsersController {
   constructor(private service: UsersService) {}
-
-  @Post()
-  async create(@Body() body: CreateUserDTO) {
-    //chamar o service aqui
-    await this.service.createUser(body);
-  }
 
   @Get('me')
   async findMe(@Req() req: any) {

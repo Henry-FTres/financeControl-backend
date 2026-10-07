@@ -1,10 +1,32 @@
-### Listar categorias
+### Variável do token (preenchida automaticamente pelo login abaixo)
+@token = {{login.response.body.access_token}}
+
+### Login
+# @name login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "abc12345"
+}
+
+### Listar categorias (padrão + minhas)
 GET http://localhost:3000/api/categories
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+Authorization: Bearer {{token}}
 
 ### Criar categoria
 POST http://localhost:3000/api/categories
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Faculdade"
+}
+
+### Criar categoria com nome repetido (deve dar 409)
+POST http://localhost:3000/api/categories
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -12,14 +34,23 @@ Content-Type: application/json
 }
 
 ### Atualizar categoria
-PUT http://localhost:3000/api/categories/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+PUT http://localhost:3000/api/categories/6
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
     "name": "Estudos"
 }
 
+### Tentar alterar categoria padrão (deve dar 404)
+PUT http://localhost:3000/api/categories/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Comida"
+}
+
 ### Apagar categoria
-DELETE http://localhost:3000/api/categories/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidXN1YXJpb0B1cGYuYnIiLCJuYW1lIjoidXN1YXJpbyB0ZXN0ZSIsImlhdCI6MTc5MTI5MDg5NiwiZXhwIjoxNzkxMzc3Mjk2fQ.dTXJ8TwnTcSzkH1_uaxLE4wLRRTnJJWBASfTOIrQEso
+DELETE http://localhost:3000/api/categories/6
+Authorization: Bearer {{token}}
