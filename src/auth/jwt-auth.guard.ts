@@ -16,7 +16,7 @@ export class JwtAuthGuard implements CanActivate {
     const method = (req.method || '').toUpperCase();
 
     if (method === 'OPTIONS') return true;
-     // caminho da rota sem a query string (parte depois do ?) e sem barra no final
+    // caminho da rota sem a query string (parte depois do ?) e sem barra no final
     const path = String(req.path || '').replace(/\/+$/, '');
 
     // liberar somente estas duas rotas, comparando o caminho exato

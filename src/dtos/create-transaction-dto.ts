@@ -1,38 +1,46 @@
-import { IsBoolean, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
-import { TransactionType } from "../../prisma/generated/prisma/client";
+import {
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
+import { TransactionType } from '../../prisma/generated/prisma/client';
 
 export class CreateTransactionDTO {
+  @IsInt()
+  accountId!: number;
 
-    @IsInt()
-    accountId!: number;
+  @IsDateString()
+  date!: string;
 
-    @IsDateString()
-    date!: string;
+  // sempre positivo: o tipo (ENTRADA/SAIDA) define se soma ou subtrai do saldo
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsPositive()
+  amount!: number;
 
-    // sempre positivo: o tipo (ENTRADA/SAIDA) define se soma ou subtrai do saldo
-    @IsNumber({ maxDecimalPlaces: 2 })
-    @IsPositive()
-    amount!: number;
+  @IsEnum(TransactionType)
+  transactionType!: TransactionType;
 
-    @IsEnum(TransactionType)
-    transactionType!: TransactionType;
+  @IsOptional()
+  @IsString()
+  description?: string;
 
-    @IsOptional()
-    @IsString()
-    description?: string;
+  // quem pagou ou recebeu (ex.: "Supermercado X", "Empresa Y")
+  @IsString()
+  @IsNotEmpty()
+  counterparty!: string;
 
-    // quem pagou ou recebeu (ex.: "Supermercado X", "Empresa Y")
-    @IsString()
-    @IsNotEmpty()
-    counterparty!: string;
+  // se é uma movimentação fixa/recorrente (ex.: aluguel, salário)
+  @IsOptional()
+  @IsBoolean()
+  fixed?: boolean;
 
-    // se é uma movimentação fixa/recorrente (ex.: aluguel, salário)
-    @IsOptional()
-    @IsBoolean()
-    fixed?: boolean;
-
-    @IsOptional()
-    @IsInt()
-    categoryId?: number;
-
+  @IsOptional()
+  @IsInt()
+  categoryId?: number;
 }
