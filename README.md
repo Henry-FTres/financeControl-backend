@@ -92,5 +92,5 @@ A pasta `http/` tem arquivos com todas as requisições e os resultados esperado
 
 ## Autores
 
-- Manuela Larissa Stivanin
-- Henry
+- Manuela Larissa Stivanin - 210542
+- Henry Afonso Fiorentin Tres - 208487
