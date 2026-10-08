@@ -1,98 +1,96 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# financeControl - API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para controle de finanças pessoais, desenvolvida na disciplina de Programação Web e Mobile (UPF). É a versão web do projeto [financeControl em C++](https://github.com/Henry-FTres/financeControl).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Permite cadastrar usuários (pessoa física ou jurídica), contas bancárias, movimentações de entrada e saída com atualização automática do saldo, categorias e metas financeiras.
 
-## Description
+## Tecnologias
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **NestJS 11** (Node.js 24)
+- **Prisma 7** com **SQLite**
+- **JWT** para autenticação e **bcrypt** para senhas
+- **class-validator** para validação dos dados
 
-## Project setup
+## Como rodar
 
 ```bash
-$ npm install
+# 1. instalar as dependências
+npm install
+
+# 2. criar o arquivo de variáveis de ambiente a partir do exemplo
+copy .env.example .env
 ```
 
-## Compile and run the project
+No `.env`, troque o `JWT_SECRET` por uma frase aleatória. Para gerar uma:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
-
-## Run tests
 
 ```bash
-# unit tests
-$ npm run test
+# 3. criar o banco e as tabelas (já inclui as categorias padrão)
+npx prisma migrate dev
+npx prisma generate
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# 4. iniciar a API em modo de desenvolvimento
+npm run start:dev
 ```
 
-## Deployment
+A API fica disponível em `http://localhost:3000/api`.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Autenticação
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+As rotas de **login** e **cadastro** são públicas. Todas as outras exigem o token recebido no login, enviado no cabeçalho:
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```
+Authorization: Bearer <token>
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Cada usuário só acessa os próprios dados: o dono de cada registro é identificado pelo token, nunca por um campo enviado na requisição.
 
-## Resources
+## Rotas
 
-Check out a few resources that may come in handy when working with NestJS:
+| Recurso | Método | Rota | Descrição |
+|---|---|---|---|
+| Auth | POST | `/api/auth/register` | Cadastro (PF ou PJ) |
+| Auth | POST | `/api/auth/login` | Login, retorna o token |
+| Usuário | GET | `/api/users/me` | Meus dados |
+| Usuário | PUT | `/api/users/me` | Atualizar meus dados |
+| Usuário | PUT | `/api/users/me/password` | Trocar senha |
+| Usuário | DELETE | `/api/users/me` | Apagar minha conta |
+| Contas | POST | `/api/accounts` | Criar conta |
+| Contas | GET | `/api/accounts` | Listar minhas contas |
+| Contas | GET | `/api/accounts/:id` | Buscar uma conta |
+| Contas | PATCH | `/api/accounts/:id` | Editar conta (o saldo não é editável) |
+| Contas | DELETE | `/api/accounts/:id` | Apagar conta |
+| Transações | POST | `/api/transactions` | Criar movimentação e atualizar o saldo |
+| Transações | GET | `/api/transactions?accountId=` | Listar (filtro por conta opcional) |
+| Transações | GET | `/api/transactions/:id` | Buscar uma movimentação |
+| Transações | PATCH | `/api/transactions/:id` | Editar e corrigir o saldo |
+| Transações | DELETE | `/api/transactions/:id` | Apagar e desfazer o efeito no saldo |
+| Categorias | GET | `/api/categories` | Listar categorias padrão e minhas |
+| Categorias | POST | `/api/categories` | Criar categoria |
+| Categorias | PUT | `/api/categories/:id` | Editar categoria própria |
+| Categorias | DELETE | `/api/categories/:id` | Apagar categoria própria |
+| Metas | GET | `/api/goals` | Listar metas (com indicação de atingida) |
+| Metas | POST | `/api/goals` | Criar meta |
+| Metas | PUT | `/api/goals/:id` | Editar meta |
+| Metas | DELETE | `/api/goals/:id` | Apagar meta |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Regras de negócio
 
-## Support
+- O usuário é **pessoa física** (exige CPF e data de nascimento) ou **jurídica** (exige CNPJ e razão social).
+- O **saldo** da conta só é alterado pelas movimentações. Criar, editar ou apagar uma movimentação atualiza o saldo na mesma transação de banco: ou as duas operações acontecem, ou nenhuma.
+- O valor das movimentações é sempre positivo; o tipo (`ENTRADA` ou `SAIDA`) define se soma ou subtrai.
+- Não pode haver duas contas com o mesmo número na mesma instituição.
+- Categorias padrão são compartilhadas e não podem ser alteradas; as criadas pelo usuário são só dele.
+- Metas não podem ter prazo no passado.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Testes
 
-## Stay in touch
+A pasta `http/` tem arquivos com todas as requisições e os resultados esperados, para usar com a extensão **REST Client** do VS Code.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Autores
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Manuela Larissa Stivanin
+- Henry
