@@ -1,22 +1,31 @@
-### Variável do token (preenchida automaticamente pelo login abaixo)
-@token = {{login.response.body.access_token}}
+# =====================================================================
+# AUTH E USUÁRIOS
+# ---------------------------------------------------------------------
+# Antes de começar (banco limpo):
+#   npx prisma migrate reset     (confirme com y)
+#   npm run start:dev
+#
+# Rode os blocos DE CIMA PARA BAIXO, clicando em "Send Request".
+# Este arquivo deve ser o PRIMEIRO a ser rodado: ele cria os dois
+# usuários usados nos outros arquivos:
+#   - usuario@upf.br  (pessoa física)  senha: abc12345
+#   - empresa@upf.br  (pessoa jurídica) senha: abc12345
+#
+# O resultado esperado de cada teste está no título do bloco.
+# =====================================================================
 
-### Login
-# @name login
-POST http://localhost:3000/api/auth/login
+@base = http://localhost:3000/api
+@token = {{login.response.body.$.access_token}}
+@tokenPJ = {{loginPJ.response.body.$.access_token}}
+@tokenTemp = {{loginTemp.response.body.$.access_token}}
+
+
+### 1. Cadastro de pessoa física -> 201
+POST {{base}}/auth/register
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br",
-    "password": "novaSenha123"
-}
-
-### Cadastro
-POST http://localhost:3000/api/auth/register
-Content-Type: application/json
-
-{
-    "name": "usuario teste",
+    "name": "Usuario Teste",
     "email": "usuario@upf.br",
     "password": "abc12345",
     "personType": "FISICA",
@@ -25,21 +34,173 @@ Content-Type: application/json
     "phone": "54999999999"
 }
 
-### Ver meus dados
-GET http://localhost:3000/api/users/me
+### 2. Cadastro de pessoa jurídica -> 201
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Empresa Teste",
+    "email": "empresa@upf.br",
+    "password": "abc12345",
+    "personType": "JURIDICA",
+    "cnpj": "12345678000199",
+    "legalName": "Empresa Teste LTDA"
+}
+
+### 3. Cadastro com email repetido -> 409 Conflict
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Outro Usuario",
+    "email": "usuario@upf.br",
+    "password": "abc12345",
+    "personType": "FISICA",
+    "cpf": "98765432100",
+    "birthDate": "1999-05-10"
+}
+
+### 4. Cadastro de pessoa física sem CPF -> 400 Bad Request
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Sem CPF",
+    "email": "semcpf@upf.br",
+    "password": "abc12345",
+    "personType": "FISICA",
+    "birthDate": "2000-01-01"
+}
+
+### 5. Cadastro com senha curta (menos de 8) -> 400 Bad Request
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Senha Curta",
+    "email": "curta@upf.br",
+    "password": "123",
+    "personType": "FISICA",
+    "cpf": "11122233344",
+    "birthDate": "2000-01-01"
+}
+
+
+### 6. Login da pessoa física -> 200 (guarda o token automaticamente)
+# @name login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "abc12345"
+}
+
+### 7. Login da pessoa jurídica -> 200 (guarda o token automaticamente)
+# @name loginPJ
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "empresa@upf.br",
+    "password": "abc12345"
+}
+
+### 8. Login com senha errada -> 401 Unauthorized
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "senhaErrada"
+}
+
+### 9. Login com email em formato inválido -> 400 Bad Request
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "nao-e-um-email",
+    "password": "abc12345"
+}
+
+
+### 10. Rota privada SEM token -> 401 Unauthorized
+GET {{base}}/users/me
+
+### 11. Ver meus dados (PF) -> 200, sem a senha na resposta
+GET {{base}}/users/me
 Authorization: Bearer {{token}}
 
-### Atualizar meus dados
-PUT http://localhost:3000/api/users/me
+### 12. Atualizar nome e telefone -> 200 (rode o 11 de novo para conferir)
+PUT {{base}}/users/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "name": "nome alterado"
+    "name": "Usuario Alterado",
+    "phone": "54988887777"
 }
 
-### Trocar senha
-PUT http://localhost:3000/api/users/me/password
+### 13. PF tentando alterar razão social -> 400 Bad Request
+PUT {{base}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "legalName": "Nao Pode LTDA"
+}
+
+### 14. PJ alterando razão social -> 200
+PUT {{base}}/users/me
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "legalName": "Empresa Nova LTDA"
+}
+
+### 15. PJ tentando alterar data de nascimento -> 400 Bad Request
+PUT {{base}}/users/me
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "birthDate": "1990-01-01"
+}
+
+### 16. Trocar o email para um que já é de outro usuário -> 409 Conflict
+PUT {{base}}/users/me
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br"
+}
+
+
+### 17. Trocar senha com a senha atual errada -> 400 Bad Request
+PUT {{base}}/users/me/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentPassword": "senhaErrada",
+    "newPassword": "novaSenha123"
+}
+
+### 18. Trocar senha com a nova muito curta -> 400 Bad Request
+PUT {{base}}/users/me/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentPassword": "abc12345",
+    "newPassword": "123"
+}
+
+### 19. Trocar senha corretamente -> 200
+PUT {{base}}/users/me/password
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -48,6 +209,64 @@ Content-Type: application/json
     "newPassword": "novaSenha123"
 }
 
-### Apagar minha conta
-DELETE http://localhost:3000/api/users/me
+### 20. Login com a senha ANTIGA -> 401 Unauthorized
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "abc12345"
+}
+
+### 21. Voltar a senha original -> 200
+# (o token do login 6 continua válido, então não precisa logar de novo)
+# Importante: rode este bloco para os outros arquivos funcionarem com abc12345
+PUT {{base}}/users/me/password
 Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentPassword": "novaSenha123",
+    "newPassword": "abc12345"
+}
+
+
+# ---------------------------------------------------------------------
+# Apagar conta: usa um usuário TEMPORÁRIO, para não apagar os de teste
+# ---------------------------------------------------------------------
+
+### 22. Cadastrar usuário temporário -> 201
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Temporario",
+    "email": "temp@upf.br",
+    "password": "abc12345",
+    "personType": "FISICA",
+    "cpf": "55566677788",
+    "birthDate": "2001-01-01"
+}
+
+### 23. Login do temporário -> 200
+# @name loginTemp
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "temp@upf.br",
+    "password": "abc12345"
+}
+
+### 24. Apagar a própria conta -> 200
+DELETE {{base}}/users/me
+Authorization: Bearer {{tokenTemp}}
+
+### 25. Login do usuário apagado -> 401 Unauthorized
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "temp@upf.br",
+    "password": "abc12345"
+}

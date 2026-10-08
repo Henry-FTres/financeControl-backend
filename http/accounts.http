@@ -1,0 +1,131 @@
+# =====================================================================
+# CONTAS BANCÁRIAS
+# ---------------------------------------------------------------------
+# Pré-requisito: ter rodado o auth.http (cria os usuários de teste).
+# Rode os blocos DE CIMA PARA BAIXO.
+#
+# Os ids das contas criadas são guardados automaticamente
+# (createAccount e createAccount2), não precisa digitar números.
+#
+# Para rodar de novo do zero: npx prisma migrate reset e rode o
+# auth.http antes (senão a criação dá 409, porque a conta já existe).
+# Observação: o saldo (balance) volta como texto, ex.: "1500".
+# É o tipo Decimal, usado para não perder precisão com dinheiro.
+# =====================================================================
+
+@base = http://localhost:3000/api
+@token = {{login.response.body.$.access_token}}
+@tokenPJ = {{loginPJ.response.body.$.access_token}}
+
+
+### Login da pessoa física -> 200 (rode primeiro)
+# @name login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "abc12345"
+}
+
+### Login da pessoa jurídica -> 200 (usado nos testes de isolamento)
+# @name loginPJ
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "empresa@upf.br",
+    "password": "abc12345"
+}
+
+
+### 1. Criar conta corrente -> 201
+# @name createAccount
+POST {{base}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountNumber": "12345-6",
+    "institution": "Nubank",
+    "pixKey": "usuario@upf.br",
+    "accountType": "CORRENTE",
+    "balance": 1500
+}
+
+### 2. Criar conta poupança -> 201
+# @name createAccount2
+POST {{base}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountNumber": "98765-4",
+    "institution": "Sicredi",
+    "accountType": "POUPANCA",
+    "balance": 300.50
+}
+
+### 3. Mesmo número na mesma instituição -> 409 Conflict
+POST {{base}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountNumber": "12345-6",
+    "institution": "Nubank",
+    "accountType": "CORRENTE",
+    "balance": 0
+}
+
+### 4. Tipo de conta inválido -> 400 Bad Request
+POST {{base}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountNumber": "11111-1",
+    "institution": "Banrisul",
+    "accountType": "INVESTIMENTO",
+    "balance": 0
+}
+
+### 5. Listar minhas contas -> 200 (aparecem as duas)
+GET {{base}}/accounts
+Authorization: Bearer {{token}}
+
+### 6. Buscar uma conta -> 200
+GET {{base}}/accounts/{{createAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 7. Outro usuário tentando ver a minha conta -> 404 Not Found
+GET {{base}}/accounts/{{createAccount.response.body.$.id}}
+Authorization: Bearer {{tokenPJ}}
+
+### 8. Editar a chave Pix -> 200
+PATCH {{base}}/accounts/{{createAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "pixKey": "54999999999"
+}
+
+### 9. Tentar alterar o saldo direto -> 200, mas o saldo NÃO muda
+# O campo balance não está no DTO de edição, então é descartado (whitelist).
+# Só as transações alteram o saldo. Confira que continua 1500.
+PATCH {{base}}/accounts/{{createAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "balance": 999999
+}
+
+### 10. Apagar a conta poupança -> 204 No Content
+DELETE {{base}}/accounts/{{createAccount2.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 11. Buscar a conta apagada -> 404 Not Found
+GET {{base}}/accounts/{{createAccount2.response.body.$.id}}
+Authorization: Bearer {{token}}

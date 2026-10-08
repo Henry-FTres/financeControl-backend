@@ -1,0 +1,208 @@
+# =====================================================================
+# TRANSAÇÕES (MOVIMENTAÇÕES) E SALDO
+# ---------------------------------------------------------------------
+# Pré-requisito: ter rodado o auth.http (cria os usuários de teste).
+# Rode os blocos DE CIMA PARA BAIXO.
+#
+# Este arquivo cria a própria conta (saldo inicial 1000) e acompanha
+# o saldo a cada passo. O saldo esperado está no título dos blocos
+# "Ver saldo". As categorias padrão têm ids 1 a 5 (1 = Alimentação).
+#
+# Para rodar de novo do zero: npx prisma migrate reset e rode o
+# auth.http antes (senão a criação da conta dá 409).
+# Observação: valores em dinheiro voltam como texto, ex.: "1300".
+# =====================================================================
+
+@base = http://localhost:3000/api
+@token = {{login.response.body.$.access_token}}
+@tokenPJ = {{loginPJ.response.body.$.access_token}}
+
+
+### Login da pessoa física -> 200 (rode primeiro)
+# @name login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "usuario@upf.br",
+    "password": "abc12345"
+}
+
+### Login da pessoa jurídica -> 200 (usado nos testes de isolamento)
+# @name loginPJ
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "empresa@upf.br",
+    "password": "abc12345"
+}
+
+
+### 1. Criar uma conta para os testes (saldo inicial 1000) -> 201
+# @name txAccount
+POST {{base}}/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountNumber": "55555-5",
+    "institution": "Banco do Brasil",
+    "accountType": "CORRENTE",
+    "balance": 1000
+}
+
+### 2. Entrada de 500 (salário, fixa) -> 201
+# @name entrada
+POST {{base}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-01",
+    "amount": 500,
+    "transactionType": "ENTRADA",
+    "description": "Salário",
+    "counterparty": "Empresa X",
+    "fixed": true
+}
+
+### 3. Saída de 200 na categoria Alimentação -> 201
+# @name saida
+POST {{base}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-05",
+    "amount": 200,
+    "transactionType": "SAIDA",
+    "description": "Mercado do mês",
+    "counterparty": "Supermercado Y",
+    "categoryId": 1
+}
+
+### 4. Ver saldo -> balance "1300"  (1000 + 500 - 200)
+GET {{base}}/accounts/{{txAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 5. Listar movimentações da conta -> 200 (mais recente primeiro)
+GET {{base}}/transactions?accountId={{txAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 6. Buscar uma movimentação -> 200
+GET {{base}}/transactions/{{saida.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 7. Corrigir o valor da saída de 200 para 250 -> 200
+PATCH {{base}}/transactions/{{saida.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "amount": 250
+}
+
+### 8. Ver saldo -> balance "1250"  (o saldo recebe só a diferença: -50)
+GET {{base}}/accounts/{{txAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 9. Apagar a saída -> 204 No Content
+DELETE {{base}}/transactions/{{saida.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 10. Ver saldo -> balance "1500"  (o efeito da saída foi desfeito)
+GET {{base}}/accounts/{{txAccount.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+
+# ---------------------------------------------------------------------
+# Testes de erro
+# ---------------------------------------------------------------------
+
+### 11. Valor negativo -> 400 Bad Request
+POST {{base}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-06",
+    "amount": -100,
+    "transactionType": "SAIDA",
+    "counterparty": "Loja Z"
+}
+
+### 12. Tipo inválido -> 400 Bad Request
+POST {{base}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-06",
+    "amount": 100,
+    "transactionType": "TRANSFERENCIA",
+    "counterparty": "Loja Z"
+}
+
+### 13. Categoria que não existe -> 404 Not Found
+POST {{base}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-06",
+    "amount": 100,
+    "transactionType": "SAIDA",
+    "counterparty": "Loja Z",
+    "categoryId": 999
+}
+
+### 14. Outro usuário lançando na MINHA conta -> 404 Not Found
+POST {{base}}/transactions
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-06",
+    "amount": 100,
+    "transactionType": "SAIDA",
+    "counterparty": "Invasor"
+}
+
+### 15. Outro usuário vendo a minha movimentação -> 404 Not Found
+GET {{base}}/transactions/{{entrada.response.body.$.id}}
+Authorization: Bearer {{tokenPJ}}
+
+### 16. A empresa cria uma categoria só dela -> 201
+# @name catPJ
+POST {{base}}/categories
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "name": "Fornecedores"
+}
+
+### 17. Usar a categoria da empresa numa movimentação minha -> 404 Not Found
+POST {{base}}/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "accountId": {{txAccount.response.body.$.id}},
+    "date": "2026-10-06",
+    "amount": 100,
+    "transactionType": "SAIDA",
+    "counterparty": "Loja Z",
+    "categoryId": {{catPJ.response.body.$.id}}
+}
+
+### 18. Ver saldo -> continua "1500" (nenhum dos testes de erro alterou)
+GET {{base}}/accounts/{{txAccount.response.body.$.id}}
+Authorization: Bearer {{token}}

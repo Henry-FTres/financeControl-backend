@@ -1,9 +1,22 @@
-### Variável do token (preenchida automaticamente pelo login abaixo)
-@token = {{login.response.body.access_token}}
+# =====================================================================
+# METAS
+# ---------------------------------------------------------------------
+# Pré-requisito: ter rodado o auth.http (cria os usuários de teste).
+# Rode os blocos DE CIMA PARA BAIXO.
+#
+# O campo "achieved" (meta atingida) não fica no banco: é calculado
+# na listagem, comparando currentAmount >= targetAmount.
+# O id da meta criada é guardado automaticamente (createGoal).
+# =====================================================================
 
-### Login
+@base = http://localhost:3000/api
+@token = {{login.response.body.$.access_token}}
+@tokenPJ = {{loginPJ.response.body.$.access_token}}
+
+
+### Login da pessoa física -> 200 (rode primeiro)
 # @name login
-POST http://localhost:3000/api/auth/login
+POST {{base}}/auth/login
 Content-Type: application/json
 
 {
@@ -11,23 +24,31 @@ Content-Type: application/json
     "password": "abc12345"
 }
 
-### Listar metas
-GET http://localhost:3000/api/goals
-Authorization: Bearer {{token}}
+### Login da pessoa jurídica -> 200 (usado nos testes de isolamento)
+# @name loginPJ
+POST {{base}}/auth/login
+Content-Type: application/json
 
-### Criar meta
-POST http://localhost:3000/api/goals
+{
+    "email": "empresa@upf.br",
+    "password": "abc12345"
+}
+
+
+### 1. Criar meta de 5000 -> 201 (currentAmount começa em "0")
+# @name createGoal
+POST {{base}}/goals
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
     "targetAmount": 5000,
-    "deadline": "2026-12-31",
+    "deadline": "2027-12-31",
     "description": "Viagem de férias"
 }
 
-### Criar meta com prazo no passado (deve dar 400)
-POST http://localhost:3000/api/goals
+### 2. Prazo no passado -> 400 Bad Request
+POST {{base}}/goals
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -37,8 +58,35 @@ Content-Type: application/json
     "description": "Meta inválida"
 }
 
-### Atualizar progresso da meta
-PUT http://localhost:3000/api/goals/1
+### 3. Valor alvo negativo -> 400 Bad Request
+POST {{base}}/goals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "targetAmount": -500,
+    "deadline": "2027-12-31"
+}
+
+### 4. Listar -> 200, com "achieved": false
+GET {{base}}/goals
+Authorization: Bearer {{token}}
+
+### 5. Registrar progresso: juntou 2500 -> 200
+PUT {{base}}/goals/{{createGoal.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentAmount": 2500
+}
+
+### 6. Listar -> "achieved": false (2500 de 5000)
+GET {{base}}/goals
+Authorization: Bearer {{token}}
+
+### 7. Registrar progresso: juntou 5000 -> 200
+PUT {{base}}/goals/{{createGoal.response.body.$.id}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -46,6 +94,45 @@ Content-Type: application/json
     "currentAmount": 5000
 }
 
-### Apagar meta
-DELETE http://localhost:3000/api/goals/1
+### 8. Listar -> "achieved": true 🎯
+GET {{base}}/goals
+Authorization: Bearer {{token}}
+
+### 9. Valor atual negativo -> 400 Bad Request
+PUT {{base}}/goals/{{createGoal.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "currentAmount": -10
+}
+
+### 10. Mudar o prazo para o passado -> 400 Bad Request
+PUT {{base}}/goals/{{createGoal.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "deadline": "2020-01-01"
+}
+
+### 11. Outro usuário tentando alterar a minha meta -> 404 Not Found
+PUT {{base}}/goals/{{createGoal.response.body.$.id}}
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "currentAmount": 0
+}
+
+### 12. Outro usuário listando -> 200, lista vazia (não vê a minha meta)
+GET {{base}}/goals
+Authorization: Bearer {{tokenPJ}}
+
+### 13. Apagar a meta -> 200
+DELETE {{base}}/goals/{{createGoal.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 14. Apagar de novo -> 404 Not Found
+DELETE {{base}}/goals/{{createGoal.response.body.$.id}}
 Authorization: Bearer {{token}}

@@ -1,9 +1,23 @@
-### Variável do token (preenchida automaticamente pelo login abaixo)
-@token = {{login.response.body.access_token}}
+# =====================================================================
+# CATEGORIAS
+# ---------------------------------------------------------------------
+# Pré-requisito: ter rodado o auth.http (cria os usuários de teste).
+# Rode os blocos DE CIMA PARA BAIXO.
+#
+# Categorias padrão (criadas pela migration, ids 1 a 5):
+#   Alimentação, Transporte, Moradia, Lazer, Saúde
+# Elas aparecem para todos e não podem ser alteradas nem apagadas.
+# O id da categoria criada é guardado automaticamente (createCategory).
+# =====================================================================
 
-### Login
+@base = http://localhost:3000/api
+@token = {{login.response.body.$.access_token}}
+@tokenPJ = {{loginPJ.response.body.$.access_token}}
+
+
+### Login da pessoa física -> 200 (rode primeiro)
 # @name login
-POST http://localhost:3000/api/auth/login
+POST {{base}}/auth/login
 Content-Type: application/json
 
 {
@@ -11,12 +25,24 @@ Content-Type: application/json
     "password": "abc12345"
 }
 
-### Listar categorias (padrão + minhas)
-GET http://localhost:3000/api/categories
+### Login da pessoa jurídica -> 200 (usado nos testes de isolamento)
+# @name loginPJ
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "empresa@upf.br",
+    "password": "abc12345"
+}
+
+
+### 1. Listar categorias -> 200 (as 5 padrão, em ordem alfabética)
+GET {{base}}/categories
 Authorization: Bearer {{token}}
 
-### Criar categoria
-POST http://localhost:3000/api/categories
+### 2. Criar categoria própria -> 201
+# @name createCategory
+POST {{base}}/categories
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -24,8 +50,8 @@ Content-Type: application/json
     "name": "Faculdade"
 }
 
-### Criar categoria com nome repetido (deve dar 409)
-POST http://localhost:3000/api/categories
+### 3. Criar com o nome de uma categoria padrão -> 409 Conflict
+POST {{base}}/categories
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -33,8 +59,30 @@ Content-Type: application/json
     "name": "Lazer"
 }
 
-### Atualizar categoria
-PUT http://localhost:3000/api/categories/6
+### 4. Criar de novo uma categoria que já tenho -> 409 Conflict
+POST {{base}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Faculdade"
+}
+
+### 5. Nome muito curto (menos de 3 letras) -> 400 Bad Request
+POST {{base}}/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "AB"
+}
+
+### 6. Listar -> 200 (as 5 padrão + Faculdade)
+GET {{base}}/categories
+Authorization: Bearer {{token}}
+
+### 7. Renomear minha categoria -> 200
+PUT {{base}}/categories/{{createCategory.response.body.$.id}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -42,8 +90,17 @@ Content-Type: application/json
     "name": "Estudos"
 }
 
-### Tentar alterar categoria padrão (deve dar 404)
-PUT http://localhost:3000/api/categories/1
+### 8. Renomear para o nome de uma padrão -> 409 Conflict
+PUT {{base}}/categories/{{createCategory.response.body.$.id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "Saúde"
+}
+
+### 9. Tentar alterar uma categoria padrão -> 404 Not Found
+PUT {{base}}/categories/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -51,6 +108,27 @@ Content-Type: application/json
     "name": "Comida"
 }
 
-### Apagar categoria
-DELETE http://localhost:3000/api/categories/6
+### 10. Tentar apagar uma categoria padrão -> 404 Not Found
+DELETE {{base}}/categories/1
+Authorization: Bearer {{token}}
+
+### 11. Outro usuário tentando alterar a minha categoria -> 404 Not Found
+PUT {{base}}/categories/{{createCategory.response.body.$.id}}
+Authorization: Bearer {{tokenPJ}}
+Content-Type: application/json
+
+{
+    "name": "Invasor"
+}
+
+### 12. Outro usuário listando -> 200 (vê as padrão, mas NÃO vê "Estudos")
+GET {{base}}/categories
+Authorization: Bearer {{tokenPJ}}
+
+### 13. Apagar minha categoria -> 200
+DELETE {{base}}/categories/{{createCategory.response.body.$.id}}
+Authorization: Bearer {{token}}
+
+### 14. Apagar de novo -> 404 Not Found
+DELETE {{base}}/categories/{{createCategory.response.body.$.id}}
 Authorization: Bearer {{token}}
