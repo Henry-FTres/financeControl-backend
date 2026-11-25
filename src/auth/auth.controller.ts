@@ -7,12 +7,14 @@ import { LoginDto } from 'src/dtos/login-dto';
 export class AuthController {
   constructor(private auth: AuthService) {}
 
+  // [LOCAL] Rota POST /api/auth/login: entrar com e-mail e senha, devolve o token
   @Post('login')
   @HttpCode(200) // login não cria nada, então responde 200 em vez do 201 padrão do POST
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto.email, dto.password);
   }
 
+  // [LOCAL] Rota POST /api/auth/register: cadastrar usuário (pessoa física ou jurídica)
   @Post('register')
   register(@Body() dto: CreateUserDTO) {
     return this.auth.register(dto);

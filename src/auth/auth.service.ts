@@ -11,6 +11,7 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
+  // [LOCAL] Login: confere e-mail e senha e gera o token JWT
   async login(email: string, password: string) {
     const user = await this.validate(email, password);
 
@@ -22,6 +23,7 @@ export class AuthService {
       user: payload,
     };
   }
+  // [LOCAL] Conferência da senha: compara a senha digitada com o hash salvo (bcrypt)
   async validate(email: string, password: string) {
     //select na tabela where email = email
     //retorna objeto User (name, email, pwd)
@@ -36,6 +38,7 @@ export class AuthService {
     return safe;
   }
 
+  // [LOCAL] Cadastro: cria o usuário e já devolve o token (entra direto)
   async register(dto: CreateUserDTO) {
     const user = await this.userService.createUser(dto);
     const payload = { sub: user.id, email: user.email, name: user.name };

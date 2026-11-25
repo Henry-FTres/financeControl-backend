@@ -28,6 +28,7 @@ enum TransactionType {
   SAIDA
 }
 
+// [LOCAL] Tabela de usuários (PF ou PJ)
 model User {
   id           Int        @id @default(autoincrement())
   name         String
@@ -46,6 +47,7 @@ model User {
   goals      Goal[]
 }
 
+// [LOCAL] Tabela de contas bancárias (o saldo fica aqui)
 model Account {
   id            Int           @id @default(autoincrement())
   accountNumber String
@@ -61,6 +63,7 @@ model Account {
   @@index([userId])
 }
 
+// [LOCAL] Tabela de movimentações (entradas e saídas de uma conta)
 model Transaction {
   id              Int             @id @default(autoincrement())
   date            DateTime
@@ -78,6 +81,7 @@ model Transaction {
   @@index([categoryId])
 }
 
+// [LOCAL] Tabela de categorias (userId vazio = categoria padrão, para todos)
 model Category {
   id           Int           @id @default(autoincrement())
   name         String
@@ -88,6 +92,7 @@ model Category {
   @@index([userId])
 }
 
+// [LOCAL] Tabela de metas financeiras
 model Goal {
   id            Int      @id @default(autoincrement())
   targetAmount  Decimal

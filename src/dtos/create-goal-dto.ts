@@ -7,6 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 
+// [LOCAL] Validação da criação de meta: valor alvo, prazo e descrição
 export class CreateGoalDTO {
   @IsNumber()
   @IsNotEmpty()

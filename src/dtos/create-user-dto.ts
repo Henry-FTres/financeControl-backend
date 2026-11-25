@@ -11,6 +11,7 @@ import {
 } from 'class-validator';
 import { PersonType } from '../../prisma/generated/prisma/client';
 
+// [LOCAL] Validação do cadastro: senha com 8+ caracteres; CPF e nascimento (PF) ou CNPJ e razão social (PJ)
 export class CreateUserDTO {
   @IsString()
   @IsNotEmpty()

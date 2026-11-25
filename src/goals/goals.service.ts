@@ -11,6 +11,7 @@ import { UpdateGoalDTO } from 'src/dtos/update-goal-dto';
 export class GoalsService {
   constructor(private prisma: PrismaService) {} // da acesso ao banco de dados, injetando o PrismaService
 
+  // [LOCAL] Listar metas: calcula "achieved" (atingida) comparando o valor atual com o alvo
   async findAll(userId: number) {
     const goals = await this.prisma.goal.findMany({
       where: { userId: userId }, // só as metas do user logado
@@ -24,6 +25,7 @@ export class GoalsService {
     }));
   }
 
+  // [LOCAL] Criar meta: recusa prazo no passado
   async create(userId: number, dto: CreateGoalDTO) {
     const deadline = new Date(dto.deadline);
     const today = new Date();
@@ -44,6 +46,7 @@ export class GoalsService {
     });
   }
 
+  // [LOCAL] Editar meta: altera alvo, valor guardado, prazo e descrição
   async update(userId: number, id: number, dto: UpdateGoalDTO) {
     const goal = await this.prisma.goal.findFirst({
       // busca a meta pelo id e userId
@@ -83,6 +86,7 @@ export class GoalsService {
     });
   }
 
+  // [LOCAL] Apagar meta
   async delete(userId: number, id: number) {
     const goal = await this.prisma.goal.findFirst({
       // busca a meta pelo id e userId

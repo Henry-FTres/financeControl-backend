@@ -15,6 +15,7 @@ import { ChangePasswordDTO } from 'src/dtos/change-password-dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  // [LOCAL] Criar usuário: criptografa a senha e salva só os campos de PF ou de PJ
   async createUser(dto: CreateUserDTO) {
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const isFisica = dto.personType === PersonType.FISICA;
@@ -47,6 +48,7 @@ export class UsersService {
     }
   }
 
+  // [LOCAL] Atualizar perfil: razão social só para PJ, data de nascimento só para PF
   async updateUser(id: number, dto: UpdateUserDTO): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
@@ -86,6 +88,7 @@ export class UsersService {
     }
   }
 
+  // [LOCAL] Trocar senha: confere a senha atual antes de salvar a nova
   async changePassword(id: number, dto: ChangePasswordDTO): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
@@ -112,6 +115,7 @@ export class UsersService {
     });
   }
 
+  // [LOCAL] Apagar usuário: o banco apaga junto contas, movimentações, categorias e metas (cascade)
   async deleteUser(id: number): Promise<void> {
     await this.prisma.user.delete({
       where: { id },
@@ -141,6 +145,7 @@ export class UsersService {
   }
 
   // traduz o erro de duplicidade do banco em uma resposta clara
+  // [LOCAL] Erro 409: e-mail, CPF ou CNPJ já cadastrado
   private handleDuplicate(e: unknown): never {
     if (
       e instanceof Prisma.PrismaClientKnownRequestError &&

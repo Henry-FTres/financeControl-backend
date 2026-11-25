@@ -7,6 +7,7 @@ import {
   IsDateString,
 } from 'class-validator';
 
+// [LOCAL] Validação da edição de perfil (todos os campos opcionais)
 export class UpdateUserDTO {
   @IsOptional()
   @IsString()

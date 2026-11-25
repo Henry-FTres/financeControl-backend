@@ -11,6 +11,7 @@ import { UpdateCategoryDTO } from 'src/dtos/update-category-dto';
 export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
+  // [LOCAL] Listar categorias: as padrão (userId = null) mais as do usuário
   async findAll(userId: number) {
     return this.prisma.category.findMany({
       // busca todas as categorias do usuário, ou as categorias globais (userId = null)
@@ -21,6 +22,7 @@ export class CategoriesService {
     });
   }
 
+  // [LOCAL] Criar categoria: recusa nome repetido (409)
   async create(userId: number, dto: CreateCategoryDTO) {
     const existing = await this.prisma.category.findFirst({
       // procura uma categoria com o mesmo nome, entre as padrão e as do usuário
@@ -43,6 +45,7 @@ export class CategoriesService {
     });
   }
 
+  // [LOCAL] Editar categoria: só as do usuário (as padrão não podem ser alteradas)
   async update(userId: number, id: number, dto: UpdateCategoryDTO) {
     const category = await this.prisma.category.findFirst({
       // busca a categoria pelo id e userId
@@ -75,6 +78,7 @@ export class CategoriesService {
     });
   }
 
+  // [LOCAL] Apagar categoria: só as do usuário; as movimentações dela ficam sem categoria
   async delete(userId: number, id: number) {
     const category = await this.prisma.category.findFirst({
       // busca a categoria pelo id e userId
