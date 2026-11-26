@@ -79,7 +79,6 @@ export class AccountsService {
     });
   }
 
-  // traduz o erro de duplicidade do banco (número + instituição repetidos) em uma resposta clara
   private handleDuplicate(e: unknown): never {
     if (
       e instanceof Prisma.PrismaClientKnownRequestError &&
