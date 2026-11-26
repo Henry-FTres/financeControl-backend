@@ -24,7 +24,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "abc12345"
 }
 
@@ -48,7 +48,7 @@ Content-Type: application/json
 {
     "accountNumber": "12345-6",
     "institution": "Nubank",
-    "pixKey": "usuario@upf.br",
+    "pixKey": "henry@teste.com",
     "accountType": "CORRENTE",
     "balance": 1500
 }

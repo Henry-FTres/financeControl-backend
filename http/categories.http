@@ -21,7 +21,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "abc12345"
 }
 

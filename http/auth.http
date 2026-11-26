@@ -8,7 +8,7 @@
 # Rode os blocos DE CIMA PARA BAIXO, clicando em "Send Request".
 # Este arquivo deve ser o PRIMEIRO a ser rodado: ele cria os dois
 # usuários usados nos outros arquivos:
-#   - usuario@upf.br  (pessoa física)  senha: abc12345
+#   - henry@teste.com  (pessoa física)  senha: abc12345
 #   - empresa@upf.br  (pessoa jurídica) senha: abc12345
 #
 # O resultado esperado de cada teste está no título do bloco.
@@ -26,7 +26,7 @@ Content-Type: application/json
 
 {
     "name": "Usuario Teste",
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "abc12345",
     "personType": "FISICA",
     "cpf": "12345678900",
@@ -53,7 +53,7 @@ Content-Type: application/json
 
 {
     "name": "Outro Usuario",
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "abc12345",
     "personType": "FISICA",
     "cpf": "98765432100",
@@ -92,7 +92,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "abc12345"
 }
 
@@ -111,7 +111,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "senhaErrada"
 }
 
@@ -175,7 +175,7 @@ Authorization: Bearer {{tokenPJ}}
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br"
+    "email": "henry@teste.com"
 }
 
 
@@ -214,7 +214,7 @@ POST {{base}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "usuario@upf.br",
+    "email": "henry@teste.com",
     "password": "abc12345"
 }
 
