@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
-// [LOCAL] Inicialização da API: libera CORS, prefixo /api, validação global dos DTOs e porta 3000
+// Configura e inicia a API na porta 3000
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();

@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { TransactionType } from '../../prisma/generated/prisma/client';
 
-// [LOCAL] Validação da edição de movimentação (todos os campos opcionais)
+// Dados para editar a movimentação
 export class UpdateTransactionDTO {
   @IsOptional()
   @IsDateString()

@@ -19,13 +19,13 @@ import { UpdateTransactionDTO } from 'src/dtos/update-transaction-dto';
 export class TransactionsController {
   constructor(private transactionsService: TransactionsService) {}
 
-  // [LOCAL] Rota POST /api/transactions: criar movimentação (atualiza o saldo da conta)
+  // Cria uma movimentação e atualiza o saldo
   @Post()
   create(@Req() req: any, @Body() dto: CreateTransactionDTO) {
     return this.transactionsService.create(req.user.sub, dto);
   }
 
-  // [LOCAL] Rota GET /api/transactions?accountId=: listar movimentações (filtro por conta opcional)
+  // Lista as movimentações, filtrando por conta se quiser
   @Get()
   findAll(
     @Req() req: any,
@@ -35,13 +35,13 @@ export class TransactionsController {
     return this.transactionsService.findAll(req.user.sub, accountId);
   }
 
-  // [LOCAL] Rota GET /api/transactions/:id: buscar uma movimentação
+  // Busca uma movimentação pelo id
   @Get(':id')
   findOne(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
     return this.transactionsService.findOne(req.user.sub, id);
   }
 
-  // [LOCAL] Rota PATCH /api/transactions/:id: editar movimentação (corrige o saldo)
+  // Edita a movimentação e corrige o saldo
   @Patch(':id')
   update(
     @Req() req: any,
@@ -51,7 +51,7 @@ export class TransactionsController {
     return this.transactionsService.update(req.user.sub, id, dto);
   }
 
-  // [LOCAL] Rota DELETE /api/transactions/:id: apagar movimentação (desfaz o efeito no saldo)
+  // Apaga a movimentação e ajusta o saldo
   @Delete(':id')
   @HttpCode(204)
   remove(@Req() req: any, @Param('id', ParseIntPipe) id: number) {

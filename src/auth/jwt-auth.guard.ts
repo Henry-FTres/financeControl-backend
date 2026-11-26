@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-// [LOCAL] Proteção das rotas: exige o token (Bearer) em todas, menos login e cadastro
+// Bloqueia rotas sem token, menos login e cadastro
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(private jwt: JwtService) {}

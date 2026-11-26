@@ -12,7 +12,7 @@ import { Prisma } from '../../prisma/generated/prisma/client';
 export class AccountsService {
   constructor(private prisma: PrismaService) {}
 
-  // [LOCAL] Criar conta: o dono é sempre o usuário do token
+  // Cria a conta para o usuário logado
   async create(userId: number, dto: CreateAccountDTO) {
     try {
       return await this.prisma.account.create({
@@ -30,7 +30,7 @@ export class AccountsService {
     }
   }
 
-  // [LOCAL] Listar contas do usuário, em ordem alfabética de instituição
+  // Contas do usuário em ordem alfabética
   async findAll(userId: number) {
     return this.prisma.account.findMany({
       where: { userId },
@@ -38,7 +38,7 @@ export class AccountsService {
     });
   }
 
-  // [LOCAL] Buscar uma conta: só encontra se for do usuário logado (senão, 404)
+  // Só encontra contas do próprio usuário
   async findOne(userId: number, id: number) {
     const account = await this.prisma.account.findFirst({
       where: { id, userId },
@@ -51,7 +51,7 @@ export class AccountsService {
     return account;
   }
 
-  // [LOCAL] Editar conta: o campo balance (saldo) fica de fora de propósito
+  // Edita a conta sem mexer no saldo
   async update(userId: number, id: number, dto: UpdateAccountDTO) {
     await this.findOne(userId, id); // garante que a conta existe e é do usuário
 
@@ -70,7 +70,7 @@ export class AccountsService {
     }
   }
 
-  // [LOCAL] Apagar conta
+  // Apaga a conta
   async remove(userId: number, id: number) {
     await this.findOne(userId, id); // garante que a conta existe e é do usuário
 
@@ -80,7 +80,6 @@ export class AccountsService {
   }
 
   // traduz o erro de duplicidade do banco (número + instituição repetidos) em uma resposta clara
-  // [LOCAL] Erro 409: conta com o mesmo número na mesma instituição
   private handleDuplicate(e: unknown): never {
     if (
       e instanceof Prisma.PrismaClientKnownRequestError &&

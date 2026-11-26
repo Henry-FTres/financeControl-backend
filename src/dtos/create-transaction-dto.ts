@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { TransactionType } from '../../prisma/generated/prisma/client';
 
-// [LOCAL] Validação da criação de movimentação: valor positivo com até 2 casas, tipo ENTRADA/SAIDA, data e conta
+// Dados para criar uma movimentação
 export class CreateTransactionDTO {
   @IsInt()
   accountId!: number;

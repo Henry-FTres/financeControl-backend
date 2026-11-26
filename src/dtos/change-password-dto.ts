@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
-// [LOCAL] Validação da troca de senha: senha atual e nova senha
+// Dados para trocar a senha
 export class ChangePasswordDTO {
   @IsString()
   @IsNotEmpty()

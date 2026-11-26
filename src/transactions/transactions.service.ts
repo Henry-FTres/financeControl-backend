@@ -8,7 +8,7 @@ import { Prisma, TransactionType } from '../../prisma/generated/prisma/client';
 export class TransactionsService {
   constructor(private prisma: PrismaService) {}
 
-  // [LOCAL] Criar movimentação: salva e atualiza o saldo na mesma transação do banco ($transaction)
+  // Salva a movimentação e atualiza o saldo juntos
   async create(userId: number, dto: CreateTransactionDTO) {
     await this.checkAccount(userId, dto.accountId);
     if (dto.categoryId) await this.checkCategory(userId, dto.categoryId);
@@ -38,7 +38,7 @@ export class TransactionsService {
     });
   }
 
-  // [LOCAL] Listar movimentações do usuário, da mais nova para a mais antiga
+  // Movimentações do usuário, das mais novas primeiro
   async findAll(userId: number, accountId?: number) {
     return this.prisma.transaction.findMany({
       where: {
@@ -49,7 +49,7 @@ export class TransactionsService {
     });
   }
 
-  // [LOCAL] Buscar uma movimentação: só encontra se a conta for do usuário logado
+  // Só encontra movimentações do próprio usuário
   async findOne(userId: number, id: number) {
     const transaction = await this.prisma.transaction.findFirst({
       where: { id, account: { userId } },
@@ -62,7 +62,7 @@ export class TransactionsService {
     return transaction;
   }
 
-  // [LOCAL] Editar movimentação: aplica no saldo só a diferença entre o valor antigo e o novo
+  // Ajusta o saldo só pela diferença de valor
   async update(userId: number, id: number, dto: UpdateTransactionDTO) {
     const old = await this.findOne(userId, id);
     if (dto.categoryId) await this.checkCategory(userId, dto.categoryId);
@@ -97,7 +97,7 @@ export class TransactionsService {
     });
   }
 
-  // [LOCAL] Apagar movimentação: apaga e devolve o valor ao saldo
+  // Apaga e devolve o valor ao saldo
   async remove(userId: number, id: number) {
     const old = await this.findOne(userId, id);
 
@@ -117,13 +117,12 @@ export class TransactionsService {
   }
 
   // ENTRADA soma ao saldo, SAIDA subtrai
-  // [LOCAL] Regra do saldo: entrada = +valor, saída = -valor
   private effect(type: TransactionType, amount: Prisma.Decimal | number) {
     const value = new Prisma.Decimal(amount);
     return type === TransactionType.ENTRADA ? value : value.negated();
   }
 
-  // [LOCAL] Garante que a conta da movimentação é do usuário logado
+  // Confere se a conta é do usuário
   private async checkAccount(userId: number, accountId: number) {
     const account = await this.prisma.account.findFirst({
       where: { id: accountId, userId },
@@ -132,7 +131,6 @@ export class TransactionsService {
   }
 
   // a categoria precisa ser global (sem dono) ou do próprio usuário
-  // [LOCAL] Garante que a categoria é padrão ou do usuário logado
   private async checkCategory(userId: number, categoryId: number) {
     const category = await this.prisma.category.findFirst({
       where: { id: categoryId, OR: [{ userId: null }, { userId }] },

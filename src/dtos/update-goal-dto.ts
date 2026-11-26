@@ -7,7 +7,7 @@ import {
   Min,
 } from 'class-validator';
 
-// [LOCAL] Validação da edição de meta (inclui o valor já guardado)
+// Dados para editar a meta
 export class UpdateGoalDTO {
   @IsNumber()
   @IsPositive()

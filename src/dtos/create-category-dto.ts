@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-// [LOCAL] Validação da criação de categoria: nome
+// Dados para criar uma categoria
 export class CreateCategoryDTO {
   @IsString()
   @IsNotEmpty()

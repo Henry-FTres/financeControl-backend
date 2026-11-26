@@ -18,25 +18,25 @@ import { UpdateAccountDTO } from 'src/dtos/update-account-dto';
 export class AccountsController {
   constructor(private accountsService: AccountsService) {}
 
-  // [LOCAL] Rota POST /api/accounts: criar conta bancária (com saldo inicial)
+  // Cria uma conta bancária com saldo inicial
   @Post()
   create(@Req() req: any, @Body() dto: CreateAccountDTO) {
     return this.accountsService.create(req.user.sub, dto);
   }
 
-  // [LOCAL] Rota GET /api/accounts: listar minhas contas
+  // Lista as contas do usuário logado
   @Get()
   findAll(@Req() req: any) {
     return this.accountsService.findAll(req.user.sub);
   }
 
-  // [LOCAL] Rota GET /api/accounts/:id: buscar uma conta
+  // Busca uma conta pelo id
   @Get(':id')
   findOne(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
     return this.accountsService.findOne(req.user.sub, id);
   }
 
-  // [LOCAL] Rota PATCH /api/accounts/:id: editar conta (o saldo não é editável)
+  // Edita a conta, menos o saldo
   @Patch(':id')
   update(
     @Req() req: any,
@@ -46,7 +46,7 @@ export class AccountsController {
     return this.accountsService.update(req.user.sub, id, dto);
   }
 
-  // [LOCAL] Rota DELETE /api/accounts/:id: apagar conta (e as movimentações dela)
+  // Apaga a conta e as movimentações dela
   @Delete(':id')
   @HttpCode(204)
   remove(@Req() req: any, @Param('id', ParseIntPipe) id: number) {

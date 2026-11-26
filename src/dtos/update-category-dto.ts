@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-// [LOCAL] Validação da edição de categoria: nome
+// Dados para renomear a categoria
 export class UpdateCategoryDTO {
   @IsString()
   @IsNotEmpty()

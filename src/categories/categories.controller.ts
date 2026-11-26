@@ -17,19 +17,19 @@ import { UpdateCategoryDTO } from 'src/dtos/update-category-dto';
 export class CategoriesController {
   constructor(private service: CategoriesService) {}
 
-  // [LOCAL] Rota GET /api/categories: listar categorias padrão e as minhas
+  // Lista as categorias padrão e as do usuário
   @Get()
   async findAll(@Req() req: any) {
     return this.service.findAll(req.user.sub);
   }
 
-  // [LOCAL] Rota POST /api/categories: criar categoria própria
+  // Cria uma categoria do usuário
   @Post()
   async create(@Req() req: any, @Body() body: CreateCategoryDTO) {
     return this.service.create(req.user.sub, body);
   }
 
-  // [LOCAL] Rota PUT /api/categories/:id: renomear categoria própria
+  // Renomeia uma categoria do usuário
   @Put(':id')
   async update(
     @Req() req: any,
@@ -39,7 +39,7 @@ export class CategoriesController {
     return this.service.update(req.user.sub, id, body);
   }
 
-  // [LOCAL] Rota DELETE /api/categories/:id: apagar categoria própria
+  // Apaga uma categoria do usuário
   @Delete(':id')
   async delete(@Req() req: any, @Param('id', ParseIntPipe) id: number) {
     return this.service.delete(req.user.sub, id);

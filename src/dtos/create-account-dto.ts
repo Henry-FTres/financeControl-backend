@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 import { AccountType } from '../../prisma/generated/prisma/client';
 
-// [LOCAL] Validação da criação de conta: número, instituição, tipo (CORRENTE/POUPANCA) e saldo inicial
+// Dados para criar uma conta bancária
 export class CreateAccountDTO {
   @IsString()
   @IsNotEmpty()

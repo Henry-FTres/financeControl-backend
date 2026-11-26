@@ -7,25 +7,25 @@ import { ChangePasswordDTO } from 'src/dtos/change-password-dto';
 export class UsersController {
   constructor(private service: UsersService) {}
 
-  // [LOCAL] Rota GET /api/users/me: dados do usuário logado (tela de perfil)
+  // Dados do usuário logado
   @Get('me')
   async findMe(@Req() req: any) {
     return await this.service.findById(req.user.sub);
   }
 
-  // [LOCAL] Rota PUT /api/users/me: atualizar meus dados
+  // Atualiza os dados do usuário
   @Put('me')
   async update(@Req() req: any, @Body() body: UpdateUserDTO) {
     await this.service.updateUser(req.user.sub, body);
   }
 
-  // [LOCAL] Rota PUT /api/users/me/password: trocar a senha
+  // Troca a senha do usuário
   @Put('me/password')
   async changePassword(@Req() req: any, @Body() body: ChangePasswordDTO) {
     await this.service.changePassword(req.user.sub, body);
   }
 
-  // [LOCAL] Rota DELETE /api/users/me: apagar minha conta (e todos os meus dados)
+  // Apaga o usuário e todos os dados dele
   @Delete('me')
   async delete(@Req() req: any) {
     await this.service.deleteUser(req.user.sub);

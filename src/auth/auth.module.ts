@@ -11,7 +11,6 @@ import { JwtAuthGuard } from './jwt-auth.guard';
     ConfigModule,
     UsersModule,
     //usado para ler o .env
-    // [LOCAL] Configuração do token JWT: chave JWT_SECRET (do .env) e validade de 1 dia
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
@@ -22,7 +21,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
   ],
   providers: [
     AuthService,
-    // [LOCAL] Liga o guard de token em toda a API (guard global)
+    // Exige token em todas as rotas
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     //APP_GUARD= token DI Nest que permite registrar um Guard global
   ],
